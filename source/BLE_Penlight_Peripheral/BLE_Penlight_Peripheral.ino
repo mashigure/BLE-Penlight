@@ -1,4 +1,4 @@
-// BLE Penlight (Peripheral)
+// BLE Concert Pen Light (Peripheral)
 
 #include <ArduinoBLE.h>
 #include "Button.h"
@@ -34,31 +34,30 @@ void setup()
 // main loop
 void loop()
 {
-    static int no = 0;
-
     if (btn.isPowerON())
     {
         // remote controlled mode
-        remoteControlledMode_loop(no);
+        remoteControlledMode_loop();
     }
 
     // stand alone mode
     btn.update();
-    no = btn.getNo();
-    led.cyclicProcess(no);
+    led.cyclicProcess(btn.getNo());
 }
 
 
 // main loop for remote controlled mode
-void remoteControlledMode_loop(int no)
+void remoteControlledMode_loop()
 {
+    int btn_peripheral = btn.getNo();
+    int btn_central = btn_peripheral;
+
     BLEDevice central = BLE.central();
 
     while (central && central.connected())
     {
-        int last_no = btn.getNo();
         btn.update();
-        int updated_no = btn.getNo();
+        btn_peripheral = btn.getNo();
 
         // Power OFF by long press
         if (!btn.isPowerON())
@@ -68,19 +67,19 @@ void remoteControlledMode_loop(int no)
         }
 
         // send
-        if (last_no != updated_no)
+        if (btn_central != btn_peripheral)
         {
-            BtnCh.writeValue((byte)updated_no);
+            BtnCh.writeValue((byte)btn_peripheral);
         }
 
         // receive
         if (LedCh.written())
         {
-            no = (int)LedCh.value();
-            btn.setNo(no);
+            btn_central = (int)LedCh.value();
+            btn.setNo(btn_central);
         }
 
         // control LEDs and wait
-        led.cyclicProcess(no);
+        led.cyclicProcess(btn_central);
     }
 }
