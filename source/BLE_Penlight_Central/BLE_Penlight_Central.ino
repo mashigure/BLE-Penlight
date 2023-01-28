@@ -8,7 +8,10 @@
 LEDBar led;
 Button btn;
 bool isScanning = false;
-const char *UUID = "19B10000-E8F2-537E-4F6C-D104768A1214";
+const char *LOCALNAME = "PenLight";
+const char *LEDSERV = "19B10000-E8F2-537E-4F6C-D104768A1214";
+const char *LEDCHAR = "19B10001-E8F2-537E-4F6C-D104768A1214";
+const char *BTNCHAR = "19B10002-E8F2-537E-4F6C-D104768A1214";
 
 
 // initialising
@@ -36,37 +39,15 @@ void loop()
 // main loop for remote controlling mode
 void remoteControllingMode_loop()
 {
+    BLEDevice peripheral;
+    BLECharacteristic ledCh;
+    BLECharacteristic btnCh;
+
     int btn_no = btn.getNo();
     int led_no = btn_no;
 
-    startScan();
-
-    BLEDevice peripheral = BLE.available();
-
-    if (!peripheral || (peripheral.localName() != "PenLight"))
+    if (!connectPeripheral(peripheral, ledCh, btnCh))
     {
-        return;
-    }
-
-    stopScan();
-
-    if (!peripheral.connect())
-    {
-        return;
-    }
-
-    if (!peripheral.discoverAttributes())
-    {
-        peripheral.disconnect();
-        return;
-    }
-
-    BLECharacteristic ledCh = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
-    BLECharacteristic btnCh = peripheral.characteristic("19B10002-E8F2-537E-4F6C-D104768A1214");
-
-    if (!ledCh || !btnCh || !ledCh.canWrite() || !btnCh.canSubscribe() || !btnCh.subscribe())
-    {
-        peripheral.disconnect();
         return;
     }
 
@@ -74,7 +55,7 @@ void remoteControllingMode_loop()
 
     while (peripheral.connected())
     {
-        // receive
+        // receive (and response)
         if (btnCh.valueUpdated())
         {
             byte value = 0;
@@ -107,11 +88,47 @@ void remoteControllingMode_loop()
 }
 
 
+bool connectPeripheral(BLEDevice &peripheral, BLECharacteristic &ledCh, BLECharacteristic &btnCh)
+{
+    startScan();
+
+    peripheral = BLE.available();
+
+    if (!peripheral || (peripheral.localName() != LOCALNAME))
+    {
+        return false;
+    }
+
+    stopScan();
+
+    if (!peripheral.connect())
+    {
+        return false;
+    }
+
+    if (!peripheral.discoverAttributes())
+    {
+        peripheral.disconnect();
+        return false;
+    }
+
+    ledCh = peripheral.characteristic(LEDCHAR);
+    btnCh = peripheral.characteristic(BTNCHAR);
+
+    if (!ledCh || !btnCh || !ledCh.canWrite() || !btnCh.canSubscribe() || !btnCh.subscribe())
+    {
+        peripheral.disconnect();
+        return false;
+    }
+
+    return true;
+}
+
+
 void startScan()
 {
-    if (!isScanning)
+    if (!isScanning && BLE.scanForUuid(LEDSERV))
     {
-        BLE.scanForUuid(UUID);
         isScanning = true;
     }
 }
