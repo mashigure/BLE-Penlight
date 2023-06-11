@@ -30,6 +30,7 @@
 
 ## Video
 - [BLEペンライト作ったで](https://www.nicovideo.jp/watch/sm41645832)（Nico-Video）
+- [eneloop1本で動くBLEペンライト作ったで](https://www.nicovideo.jp/watch/sm42342012)（Nico-Video）
 
 
 ## Licence
