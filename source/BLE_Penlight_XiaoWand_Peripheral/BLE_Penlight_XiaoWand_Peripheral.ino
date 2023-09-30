@@ -87,7 +87,7 @@ void remoteControlledMode_loop()
         btn_peripheral = btn.getNo();
 
         // Power OFF by long press
-        if (xiaowand_check_shutdown())
+        if (!xiaowand_is_active())
         {
             central.disconnect();
             return;
