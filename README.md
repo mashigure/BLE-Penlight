@@ -38,14 +38,19 @@
 
 ## Pictures
 
-### [BLE Pen light](img/Penlight.jpg)
+### [BLE Pen light (Powerbank version)](img/Penlight.jpg)
 
 ![BLE Pen light](img/Thum/Penlight.jpg)
 
 
-### [ON](img/Penlights_ON.jpg)
+### [ON (Powerbank version)](img/Penlights_ON.jpg)
 
 ![BLE Pen lights](img/Thum/Penlights_ON.jpg)
+
+
+### [ON (Xiao Wand version)](img/BLE_Penlight_XiaoWand_ON.jpg)
+
+![BLE Pen lights](img/Thum/BLE_Penlight_XiaoWand_ON.jpg)
 
 
 ### [3 BLE Pen lights](img/3Penlights.jpg)
